@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+
+    api:
+        image: java:8
+        container_name: api
+        restart: always
+        env_file: 
+            - .env
+        ports: 
+            - ${PORT}:${PORT}
