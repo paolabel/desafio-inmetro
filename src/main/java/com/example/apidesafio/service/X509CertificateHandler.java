@@ -79,12 +79,12 @@ public class X509CertificateHandler {
         return keyPair;
     }
 
-    public static ArrayList<String> extractFields(X509Certificate certificate){
+    public static ArrayList<String> extractFields(X509Certificate certificate) throws Exception{
 
 
         ArrayList<String> fields = new ArrayList<String>(5);
 
-        String issuerName = certificate.getIssuerDN().toString();
+        String issuerName = getCommonName(certificate);
         fields.add(issuerName);
         String serialNumber = certificate.getSerialNumber().toString();
         fields.add(serialNumber);

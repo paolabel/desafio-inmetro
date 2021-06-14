@@ -1,5 +1,6 @@
 package com.example.apidesafio.service;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +30,18 @@ public class Controller {
             return "não foi inserido";
         }
         return "certificado novo inserido";
+    }
+
+    @DeleteMapping("removecert")
+    public String removeCertificate(BigInteger serialNumber){
+        try {
+            DBHandler.delete(serialNumber);
+        } catch(Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "não foi removido";
+        }
+        return "certificado removido";
     }
 
 }
