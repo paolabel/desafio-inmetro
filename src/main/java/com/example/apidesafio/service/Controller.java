@@ -2,37 +2,32 @@ package com.example.apidesafio.service;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class Controller {
+
+    static final int DATE_FORMAT_LENGHT = 10;
+    static final int TIME_FORMAT_LENGHT = 8;
     
-    // adicionar checagem de comprimento de expirationDate e time
+    @GetMapping("/")
+    public String home() {
+        return "início";
+    }
+
     @PostMapping("/newcert")
     public String newCertificate(String name, String expirationDate, String time) {
 
-        // expirationDate no formato DD/MM/YYYY
-        String[] dateArray = expirationDate.split("/");
-        Calendar expirationCalendar = Calendar.getInstance();
-        int expirationYear = Integer.parseInt(dateArray[2]);
-        int expirationMonth = Integer.parseInt(dateArray[1]);
-        int expirationDay = Integer.parseInt(dateArray[0]);
+        Date expirationTime = null;
 
-        // time no formato HH:MM:SS
-        if (time != null) {
-            String[] timeArray = time.split(":");
-            int expirationHour = Integer.parseInt(timeArray[0]);
-            int expirationMin = Integer.parseInt(timeArray[1]);
-            int expirationSec = Integer.parseInt(timeArray[2]);
-            expirationCalendar.set(expirationYear, expirationMonth, expirationDay, expirationHour, expirationMin, expirationSec);
+        if (time.equals(null)) {
+            expirationTime = DateHandler.getDate(expirationDate);
         } else {
-            expirationCalendar.set(expirationYear, expirationMonth, expirationDay);
+            expirationTime = DateHandler.getDateTime(expirationDate, time);
         }
-
-        Date expirationTime = expirationCalendar.getTime();
 
         try {
             X509Certificate certificate= X509CertificateHandler.newSelfSignedCert(name, expirationTime);
@@ -45,8 +40,8 @@ public class Controller {
         return "certificado novo inserido";
     }
 
-    @DeleteMapping("removecert")
-    public String removeCertificate(BigInteger serialNumber){
+    @DeleteMapping("/removecert")
+    public String removeCertificate(BigInteger serialNumber) {
         try {
             DBHandler.delete(serialNumber);
         } catch(Exception exception) {
@@ -57,4 +52,34 @@ public class Controller {
         return "certificado removido";
     }
 
+    @GetMapping("/getvalidcerts_if")
+    public String selectValidCerts(String startDate, String startTime, String endDate, String endTime) {
+        // startDate e endDate devem estar no formato "DD/MM/YYYY"
+        // startTime e endTime devem estar no formato "HH:MM:SS"
+        
+        Long start_ms = DateHandler.getMilliseconds(startDate, startTime);
+        Long end_ms = DateHandler.getMilliseconds(endDate, endTime);
+
+        try {
+            ArrayList<X509Certificate> selection = DBHandler.selectValidityOnTime(start_ms, end_ms);
+
+            for (X509Certificate certificate : selection) {
+                String[] fields = X509CertificateHandler.extractFields(certificate);
+                System.out.println("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
+                                +"\nChave pública: "+fields[2]+"\nData de criação: "+fields[3]
+                                +"\nPrazo de validade: "+fields[4]+"\n\n");
+            }
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "não selecionou";
+        }    
+
+        return "selecionou";
+    }
+
+    @GetMapping("/getvalidcerts_now")
+    public String selectValidCertsNow() {
+        return "selecionou";
+    }
 }

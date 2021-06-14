@@ -33,10 +33,10 @@ import java.util.Random;
 
 public class X509CertificateHandler {
     
-    private final static String signatureAlgorithm = "SHA256WithRSA";
-    private final static int serialNumberLenght = 64;
-    private final static String keyPairGenAlgorithm = "RSA";
-    private final static int keysize = 2048;
+    private final static String SIGNATURE_ALGORITHM = "SHA256WithRSA";
+    private final static int SERIAL_NUMBER_LENGHT = 64;
+    private final static String KEY_PAIR_GEN_ALGORITHM = "RSA";
+    private final static int KEY_SIZE = 2048;
 
     public static X509Certificate newSelfSignedCert(String name, Date expirationTime) throws Exception{
 
@@ -49,7 +49,7 @@ public class X509CertificateHandler {
 
         X500Name issuerName = new X500Name(rnd);
 
-        BigInteger serialNumber = new BigInteger(serialNumberLenght, new Random());
+        BigInteger serialNumber = new BigInteger(SERIAL_NUMBER_LENGHT, new Random());
 
         KeyPair keyPair = generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
@@ -60,7 +60,7 @@ public class X509CertificateHandler {
         X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(issuerName,
                 serialNumber, creationTime, expirationTime, issuerName, subjectPublicKeyInfo);
 
-        JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder(signatureAlgorithm);    
+        JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM);    
 
         ContentSigner contentSigner = signerBuilder.setProvider(bcProvider).build(privateKey);
 
@@ -72,28 +72,22 @@ public class X509CertificateHandler {
     }
 
     private static KeyPair generateKeyPair() throws NoSuchAlgorithmException{
-        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(keyPairGenAlgorithm);
-        keyGenerator.initialize(keysize, new SecureRandom());
+        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(KEY_PAIR_GEN_ALGORITHM);
+        keyGenerator.initialize(KEY_SIZE, new SecureRandom());
         KeyPair keyPair = keyGenerator.generateKeyPair();
     
         return keyPair;
     }
 
-    public static ArrayList<String> extractFields(X509Certificate certificate) throws Exception{
-
-
-        ArrayList<String> fields = new ArrayList<String>(5);
+    public static String[] extractFields(X509Certificate certificate) throws Exception{
 
         String issuerName = getCommonName(certificate);
-        fields.add(issuerName);
         String serialNumber = certificate.getSerialNumber().toString();
-        fields.add(serialNumber);
-        String PublicKey = certificate.getPublicKey().toString();
-        fields.add(PublicKey);
+        String publicKey = certificate.getPublicKey().toString();
         String creationTime = certificate.getNotBefore().toString();
-        fields.add(creationTime);
         String expirationTime = certificate.getNotAfter().toString();
-        fields.add(expirationTime);
+
+        String[] fields = new String[]{issuerName, serialNumber, publicKey, creationTime, expirationTime};
 
         return fields;
     }

@@ -1,5 +1,6 @@
 package com.example.apidesafio.service;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -7,14 +8,14 @@ import java.util.ArrayList;
 
 public class DBHandler {
 
-    static String dbPath = "jdbc:sqlite:data/appdatabase.db";
+    static String DB_PATH = "jdbc:sqlite:data/appdatabase.db";
 
     public static Connection connect() {
         Connection connection = null;
 
         try {
 
-            connection = DriverManager.getConnection(dbPath);
+            connection = DriverManager.getConnection(DB_PATH);
             
             
         } catch (Exception exception) {
@@ -93,14 +94,21 @@ public class DBHandler {
         }
 
         String query =  "SELECT certificate from Certificates"
-                        +"WHERE";
+                        +"WHERE ? > creation_ms AND ? < expiration_ms";
+
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
 
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
         statement.setLong(1, end_ms);
         statement.setLong(2, start_ms);
+        ResultSet results = statement.executeQuery();
 
-        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
+        while(results.next()){
+            InputStream certificateData = results.getBinaryStream("certificate");
+            X509Certificate certificate = X509Certificate.getInstance(certificateData);
+            selection.add(certificate);
+        }
 
         return selection;
     }
