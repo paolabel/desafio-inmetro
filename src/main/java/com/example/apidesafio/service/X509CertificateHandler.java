@@ -3,11 +3,15 @@ package com.example.apidesafio.service;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
 import java.math.BigInteger;
 
@@ -19,6 +23,7 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
@@ -76,6 +81,7 @@ public class X509CertificateHandler {
 
     public static ArrayList<String> extractFields(X509Certificate certificate){
 
+
         ArrayList<String> fields = new ArrayList<String>(5);
 
         String issuerName = certificate.getIssuerDN().toString();
@@ -90,5 +96,12 @@ public class X509CertificateHandler {
         fields.add(expirationTime);
 
         return fields;
+    }
+
+    public static String getCommonName(X509Certificate certificate) throws CertificateEncodingException{
+        X500Name subjectName = new JcaX509CertificateHolder(certificate).getSubject();
+        RDN rdn = subjectName.getRDNs(BCStyle.CN)[0];
+        String commonName = IETFUtils.valueToString(rdn.getFirst().getValue());
+        return commonName;
     }
 }
