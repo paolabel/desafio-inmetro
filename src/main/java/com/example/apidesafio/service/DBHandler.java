@@ -3,6 +3,7 @@ package com.example.apidesafio.service;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DBHandler {
 
@@ -46,7 +47,7 @@ public class DBHandler {
     public static boolean insert(X509Certificate certificate) {
         boolean isInserted = false;
         String sql = "INSERT INTO Certificates(serial_number, certificate, name,"
-                    +" not_before, not_after) VALUES (?, ?, ?, ?, ?)";  
+                    +" creation_ms, expiration_ms) VALUES (?, ?, ?, ?, ?)";  
 
         try {
             String commonName = X509CertificateHandler.getCommonName(certificate);
@@ -86,5 +87,21 @@ public class DBHandler {
         return isDeleted;
     }
 
-    
+    public static ArrayList<X509Certificate> selectValidityOnTime(Long start_ms, Long end_ms) throws Exception {
+        if (start_ms > end_ms) {
+            throw new Exception("Seleção com período de tempo inválido");
+        }
+
+        String query =  "SELECT certificate from Certificates"
+                        +"WHERE";
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setLong(1, end_ms);
+        statement.setLong(2, start_ms);
+
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
+
+        return selection;
+    }
 }
