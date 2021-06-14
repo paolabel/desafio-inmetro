@@ -25,9 +25,9 @@ public class Controller {
     @PostMapping("/newcert")
     public String newCertificate(String name, String expirationDate, String time) {
 
-        Date expirationTime = null;
+        Date expirationTime = new Date();
 
-        if (time.equals(null)) {
+        if (time ==null) {
             expirationTime = DateHandler.getDate(expirationDate);
         } else {
             expirationTime = DateHandler.getDateTime(expirationDate, time);

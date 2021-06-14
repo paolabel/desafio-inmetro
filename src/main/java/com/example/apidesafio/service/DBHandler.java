@@ -2,9 +2,12 @@ package com.example.apidesafio.service;
 
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.util.ArrayList;
+
+
 
 public class DBHandler {
 
@@ -95,19 +98,12 @@ public class DBHandler {
         String query =  "SELECT certificate from Certificates"
                         +"WHERE ? > creation_ms AND ? < expiration_ms";
 
-        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
-
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
         statement.setLong(1, end_ms);
         statement.setLong(2, start_ms);
         ResultSet results = statement.executeQuery();
-
-        while(results.next()){
-            InputStream certificateData = results.getBinaryStream("certificate");
-            X509Certificate certificate = X509Certificate.getInstance(certificateData);
-            selection.add(certificate);
-        }
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
 
         return selection;
     }
@@ -115,17 +111,10 @@ public class DBHandler {
     public static ArrayList<X509Certificate> selectAllCerts() throws Exception {
         String query = "SELECT certificate from Certificates";
 
-        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
-
         Connection dbConnection = connect();
         Statement statement = dbConnection.createStatement();
         ResultSet results = statement.executeQuery(query);
-
-        while(results.next()){
-            InputStream certificateData = results.getBinaryStream("certificate");
-            X509Certificate certificate = X509Certificate.getInstance(certificateData);
-            selection.add(certificate);
-        }
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
 
         return selection;
     }
@@ -134,8 +123,6 @@ public class DBHandler {
         String query = "SELECT certificate from Certificates"
                         +"WHERE creation_ms < ? AND expiration_ms > ?";
 
-        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
-
         Long now_ms = DateHandler.getCurrentMilliseconds();
 
         Connection dbConnection = connect();
@@ -143,33 +130,31 @@ public class DBHandler {
         statement.setLong(1, now_ms);
         statement.setLong(2, now_ms);
         ResultSet results = statement.executeQuery();
-
-        while(results.next()){
-            InputStream certificateData = results.getBinaryStream("certificate");
-            X509Certificate certificate = X509Certificate.getInstance(certificateData);
-            selection.add(certificate);
-        }
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
 
         return selection;
     }
 
-    public static ArrayList<X509Certificate> selectByName(String name) {
+    public static ArrayList<X509Certificate> selectByName(String name) throws Exception{
         String query = "SELECT certificate from Certificates"
-                        +"WHERE name = ?";
-
-        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
+                        +"WHERE name = ?"; 
 
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
         statement.setString(1, name);
         ResultSet results = statement.executeQuery();
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
 
+        return selection;
+    }
+
+    private static ArrayList<X509Certificate> getFromResultSet(ResultSet results) throws Exception {
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
         while(results.next()){
             InputStream certificateData = results.getBinaryStream("certificate");
-            X509Certificate certificate = X509Certificate.getInstance(certificateData);
+            X509Certificate certificate = X509CertificateHandler.getCertificate(certificateData);
             selection.add(certificate);
         }
-
         return selection;
     }
 }

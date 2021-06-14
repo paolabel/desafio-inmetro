@@ -13,6 +13,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 
 import java.security.KeyPair;
@@ -24,6 +25,8 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
@@ -109,5 +112,11 @@ public class X509CertificateHandler {
                             +"\nPrazo de validade: "+fields[4]+"\n\n");
         }
         return response;
+    }
+
+    public static X509Certificate getCertificate(InputStream inputStream) throws CertificateException {
+        CertificateFactory X509Factory = CertificateFactory.getInstance("X.509"); 
+        X509Certificate certificate = (X509Certificate)X509Factory.generateCertificate(inputStream);
+        return certificate;
     }
 }
