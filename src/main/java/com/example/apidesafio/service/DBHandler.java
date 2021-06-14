@@ -1,8 +1,11 @@
 package com.example.apidesafio.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ public class DBHandler {
             Connection dbConnection = connect();
             PreparedStatement statement = dbConnection.prepareStatement(sql);
             statement.setInt(1, certificate.getSerialNumber().intValue());
-            statement.setObject(2, certificate);
+            statement.setBytes(2, X509CertificateHandler.x509ToPEM(certificate));
             statement.setString(3, commonName);
             statement.setLong(4, certificate.getNotBefore().getTime());
             statement.setLong(5, certificate.getNotAfter().getTime());
@@ -89,6 +92,20 @@ public class DBHandler {
     
         return isDeleted;
     }
+
+    public static void deleteAll() {
+        String sql = "DELETE FROM Certificates";
+
+        try{
+            Connection dbConnection = connect();
+            Statement statement = dbConnection.createStatement();
+            statement.execute(sql);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
 
     public static ArrayList<X509Certificate> selectValidsOnTime(Long start_ms, Long end_ms) throws Exception {
         if (start_ms > end_ms) {
@@ -150,11 +167,24 @@ public class DBHandler {
 
     private static ArrayList<X509Certificate> getFromResultSet(ResultSet results) throws Exception {
         ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
+
         while(results.next()){
-            InputStream certificateData = results.getBinaryStream("certificate");
-            X509Certificate certificate = X509CertificateHandler.getCertificate(certificateData);
+            byte[] certificateBytes = results.getBytes("certificate");
+            X509Certificate certificate = X509CertificateHandler.getCertificate(certificateBytes);
             selection.add(certificate);
         }
         return selection;
     }
+
+    /*private static byte[] serializeCertificate(X509Certificate certificate) throws Exception{
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+
+        objOutputStream.writeObject(certificate);
+        objOutputStream.flush();
+        objOutputStream.close();
+
+        byte[] certificateData = byteArrayOutputStream.toByteArray();
+        return certificateData;
+    }*/
 }

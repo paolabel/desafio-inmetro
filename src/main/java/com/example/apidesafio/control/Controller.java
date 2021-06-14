@@ -62,6 +62,18 @@ public class Controller {
         return "certificado removido";
     }
 
+    @DeleteMapping("/cleardb")
+    public String clearDB() {
+        try {
+            DBHandler.deleteAll();
+        } catch(Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "BD não foi limpo";
+        }
+        return "BD foi limpo";
+    }
+
     @GetMapping("/getvalidcerts_if")
     public String selectValidCerts(String startDate, String startTime, String endDate, String endTime) {
         // startDate e endDate devem estar no formato "DD/MM/YYYY"
@@ -102,7 +114,7 @@ public class Controller {
         return returnString;
     }
 
-    @GetMapping("/getallcerts")
+    @GetMapping("/showall")
     public String selectAll() {
         String returnString = "";
 

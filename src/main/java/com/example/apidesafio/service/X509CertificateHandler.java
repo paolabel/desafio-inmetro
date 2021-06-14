@@ -1,8 +1,10 @@
 package com.example.apidesafio.service;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -13,7 +15,10 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigInteger;
 
 import java.security.KeyPair;
@@ -24,6 +29,7 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -114,9 +120,20 @@ public class X509CertificateHandler {
         return response;
     }
 
-    public static X509Certificate getCertificate(InputStream inputStream) throws CertificateException {
+    public static X509Certificate getCertificate(byte[] byteArray) throws CertificateException {
+        InputStream inputStream = new ByteArrayInputStream(byteArray);
+        System.out.println(inputStream);
         CertificateFactory X509Factory = CertificateFactory.getInstance("X.509"); 
         X509Certificate certificate = (X509Certificate)X509Factory.generateCertificate(inputStream);
         return certificate;
+    }
+
+    public static byte[] x509ToPEM(final X509Certificate cert) throws Exception {
+        StringWriter writer = new StringWriter();
+        JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
+        pemWriter.writeObject(cert);
+        pemWriter.flush();
+        pemWriter.close();
+        return writer.toString().getBytes();
     }
 }
