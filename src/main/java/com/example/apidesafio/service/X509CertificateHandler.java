@@ -4,7 +4,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -97,7 +96,6 @@ public class X509CertificateHandler {
         String expirationTime = certificate.getNotAfter().toString();
 
         String[] fields = new String[]{issuerName, serialNumber, publicKey, creationTime, expirationTime};
-
         return fields;
     }
 
@@ -113,16 +111,15 @@ public class X509CertificateHandler {
 
         for (X509Certificate certificate : certificates) {
             String[] fields = extractFields(certificate);
-            response.concat("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
+            response = response.concat("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
                             +"\nChave pública: "+fields[2]+"\nData de criação: "+fields[3]
-                            +"\nPrazo de validade: "+fields[4]+"\n\n");
+                            +"\nVálido até: "+fields[4]+"\n\n");              
         }
         return response;
     }
 
     public static X509Certificate getCertificate(byte[] byteArray) throws CertificateException {
         InputStream inputStream = new ByteArrayInputStream(byteArray);
-        System.out.println(inputStream);
         CertificateFactory X509Factory = CertificateFactory.getInstance("X.509"); 
         X509Certificate certificate = (X509Certificate)X509Factory.generateCertificate(inputStream);
         return certificate;

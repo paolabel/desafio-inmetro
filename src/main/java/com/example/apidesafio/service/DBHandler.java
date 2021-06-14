@@ -1,15 +1,9 @@
 package com.example.apidesafio.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.util.ArrayList;
-
 
 
 public class DBHandler {
@@ -60,7 +54,7 @@ public class DBHandler {
 
             Connection dbConnection = connect();
             PreparedStatement statement = dbConnection.prepareStatement(sql);
-            statement.setInt(1, certificate.getSerialNumber().intValue());
+            statement.setString(1, certificate.getSerialNumber().toString());
             statement.setBytes(2, X509CertificateHandler.x509ToPEM(certificate));
             statement.setString(3, commonName);
             statement.setLong(4, certificate.getNotBefore().getTime());
@@ -75,7 +69,7 @@ public class DBHandler {
         return isInserted;
     }
 
-    public static boolean delete(BigInteger serialNumber) {
+    public static boolean delete(String serialNumber) {
         String sql = "DELETE FROM Certificates WHERE serial_number = ?";
 
         boolean isDeleted = false;
@@ -83,7 +77,7 @@ public class DBHandler {
         try{
             Connection dbConnection = connect();
             PreparedStatement statement = dbConnection.prepareStatement(sql);
-            statement.setInt(1, serialNumber.intValue());
+            statement.setString(1, serialNumber);
             isDeleted = statement.execute();
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
@@ -176,15 +170,4 @@ public class DBHandler {
         return selection;
     }
 
-    /*private static byte[] serializeCertificate(X509Certificate certificate) throws Exception{
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-
-        objOutputStream.writeObject(certificate);
-        objOutputStream.flush();
-        objOutputStream.close();
-
-        byte[] certificateData = byteArrayOutputStream.toByteArray();
-        return certificateData;
-    }*/
 }

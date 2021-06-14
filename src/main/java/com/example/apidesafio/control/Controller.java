@@ -19,7 +19,7 @@ public class Controller {
     
     @GetMapping("/")
     public String home() {
-        return "início";
+        return "Escutando na porta 8080";
     }
 
     @PostMapping("/newcert")
@@ -51,7 +51,7 @@ public class Controller {
     }
 
     @DeleteMapping("/removecert")
-    public String removeCertificate(BigInteger serialNumber) {
+    public String removeCertificate(String serialNumber) {
         try {
             DBHandler.delete(serialNumber);
         } catch(Exception exception) {
