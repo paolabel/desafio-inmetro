@@ -16,8 +16,7 @@ public class DBHandler {
         try {
 
             connection = DriverManager.getConnection(DB_PATH);
-            
-            
+               
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             exception.printStackTrace();
@@ -88,7 +87,7 @@ public class DBHandler {
         return isDeleted;
     }
 
-    public static ArrayList<X509Certificate> selectValidityOnTime(Long start_ms, Long end_ms) throws Exception {
+    public static ArrayList<X509Certificate> selectValidsOnTime(Long start_ms, Long end_ms) throws Exception {
         if (start_ms > end_ms) {
             throw new Exception("Seleção com período de tempo inválido");
         }
@@ -102,6 +101,67 @@ public class DBHandler {
         PreparedStatement statement = dbConnection.prepareStatement(query);
         statement.setLong(1, end_ms);
         statement.setLong(2, start_ms);
+        ResultSet results = statement.executeQuery();
+
+        while(results.next()){
+            InputStream certificateData = results.getBinaryStream("certificate");
+            X509Certificate certificate = X509Certificate.getInstance(certificateData);
+            selection.add(certificate);
+        }
+
+        return selection;
+    }
+
+    public static ArrayList<X509Certificate> selectAllCerts() throws Exception {
+        String query = "SELECT certificate from Certificates";
+
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();
+
+        Connection dbConnection = connect();
+        Statement statement = dbConnection.createStatement();
+        ResultSet results = statement.executeQuery(query);
+
+        while(results.next()){
+            InputStream certificateData = results.getBinaryStream("certificate");
+            X509Certificate certificate = X509Certificate.getInstance(certificateData);
+            selection.add(certificate);
+        }
+
+        return selection;
+    }
+
+    public static ArrayList<X509Certificate> selectValidNow() throws Exception {
+        String query = "SELECT certificate from Certificates"
+                        +"WHERE creation_ms < ? AND expiration_ms > ?";
+
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
+
+        Long now_ms = DateHandler.getCurrentMilliseconds();
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setLong(1, now_ms);
+        statement.setLong(2, now_ms);
+        ResultSet results = statement.executeQuery();
+
+        while(results.next()){
+            InputStream certificateData = results.getBinaryStream("certificate");
+            X509Certificate certificate = X509Certificate.getInstance(certificateData);
+            selection.add(certificate);
+        }
+
+        return selection;
+    }
+
+    public static ArrayList<X509Certificate> selectByName(String name) {
+        String query = "SELECT certificate from Certificates"
+                        +"WHERE name = ?";
+
+        ArrayList<X509Certificate> selection = new ArrayList<X509Certificate>();  
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setString(1, name);
         ResultSet results = statement.executeQuery();
 
         while(results.next()){

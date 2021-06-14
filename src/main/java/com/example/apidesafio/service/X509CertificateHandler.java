@@ -98,4 +98,16 @@ public class X509CertificateHandler {
         String commonName = IETFUtils.valueToString(rdn.getFirst().getValue());
         return commonName;
     }
+
+    public static String getResponseText(ArrayList<X509Certificate> certificates) throws Exception {
+        String response = "";
+
+        for (X509Certificate certificate : certificates) {
+            String[] fields = extractFields(certificate);
+            response.concat("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
+                            +"\nChave pública: "+fields[2]+"\nData de criação: "+fields[3]
+                            +"\nPrazo de validade: "+fields[4]+"\n\n");
+        }
+        return response;
+    }
 }

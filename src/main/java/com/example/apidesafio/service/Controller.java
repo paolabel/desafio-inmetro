@@ -29,6 +29,12 @@ public class Controller {
             expirationTime = DateHandler.getDateTime(expirationDate, time);
         }
 
+        if (expirationTime.getTime() < DateHandler.getCurrentMilliseconds()) {
+            Exception exception = new Exception("Prazo de validade inválido");
+            System.out.println(exception.getMessage());
+            return "não foi inserido";
+        }
+
         try {
             X509Certificate certificate= X509CertificateHandler.newSelfSignedCert(name, expirationTime);
             DBHandler.insert(certificate);
@@ -60,26 +66,69 @@ public class Controller {
         Long start_ms = DateHandler.getMilliseconds(startDate, startTime);
         Long end_ms = DateHandler.getMilliseconds(endDate, endTime);
 
-        try {
-            ArrayList<X509Certificate> selection = DBHandler.selectValidityOnTime(start_ms, end_ms);
+        String returnString = "";
 
-            for (X509Certificate certificate : selection) {
-                String[] fields = X509CertificateHandler.extractFields(certificate);
-                System.out.println("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
-                                +"\nChave pública: "+fields[2]+"\nData de criação: "+fields[3]
-                                +"\nPrazo de validade: "+fields[4]+"\n\n");
-            }
+        try {
+            ArrayList<X509Certificate> selection = DBHandler.selectValidsOnTime(start_ms, end_ms);
+            returnString = X509CertificateHandler.getResponseText(selection);
+
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             exception.printStackTrace();
             return "não selecionou";
         }    
 
-        return "selecionou";
+        return returnString;
     }
 
     @GetMapping("/getvalidcerts_now")
     public String selectValidCertsNow() {
-        return "selecionou";
+
+        String returnString = "";
+        try {
+            ArrayList<X509Certificate> selection = DBHandler.selectValidNow();
+            returnString = X509CertificateHandler.getResponseText(selection);
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "não selecionou";
+        }    
+
+        return returnString;
+    }
+
+    @GetMapping("/getallcerts")
+    public String selectAll() {
+        String returnString = "";
+
+        try {
+            ArrayList<X509Certificate> selection = DBHandler.selectAllCerts();
+            returnString = X509CertificateHandler.getResponseText(selection);
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "não selecionou";
+        }
+
+        return returnString;
+    }
+
+    @GetMapping("/getcertsbyname")
+    public String selectByName(String name) {
+        String returnString = "Todos os certificados com o titular "+name+":\n\n";
+
+        try {
+            ArrayList<X509Certificate> selection = DBHandler.selectByName(name);
+            returnString.concat(X509CertificateHandler.getResponseText(selection));
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            exception.printStackTrace();
+            return "não selecionou";
+        }
+
+        return returnString;
     }
 }
