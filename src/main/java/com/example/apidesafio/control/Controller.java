@@ -1,9 +1,13 @@
-package com.example.apidesafio.service;
+package com.example.apidesafio.control;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.example.apidesafio.service.DBHandler;
+import com.example.apidesafio.service.DateHandler;
+import com.example.apidesafio.service.X509CertificateHandler;
 
 import org.springframework.web.bind.annotation.*;
 
