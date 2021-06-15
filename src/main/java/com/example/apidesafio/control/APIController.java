@@ -22,7 +22,7 @@ public class APIController {
     }
 
     @PostMapping("/certificates")
-    public ResponseEntity<String> newCertificate(String commonName, String expirationDate) {
+    public ResponseEntity<String> newCertificate(String name, String expirationDate) {
         // expirationDate deve estar no formato "DD/MM/YYYYTHH:MM:SS"
         JSONObject responseBody = new JSONObject();
 
@@ -43,7 +43,7 @@ public class APIController {
         }
 
         try {
-            X509Certificate certificate= X509CertificateHandler.newSelfSignedCert(commonName, expirationTime);
+            X509Certificate certificate= X509CertificateHandler.newSelfSignedCert(name, expirationTime);
             DBHandler.insert(certificate);
 
             String[] fields = X509CertificateHandler.extractFields(certificate);
