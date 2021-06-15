@@ -23,6 +23,7 @@ public class APIController {
 
     @PostMapping("/certificates")
     public ResponseEntity<String> newCertificate(String name, String expirationDate) {
+        
         JSONObject responseBody = new JSONObject();
 
         Date expirationTime = new Date();

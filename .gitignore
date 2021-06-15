@@ -4,7 +4,7 @@ target/
 wrapper
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+data/appdatabase.db
 ### STS ###
 .apt_generated
 .classpath

@@ -26,9 +26,9 @@ public class DBHandler {
 
     public static void createCertTable() {
         String sql = "CREATE TABLE IF NOT EXISTS Certificates (\n"
-                    +"serial_number	    VARCHAR(30) PRIMARY KEY NOT NULL,\n"
+                    +"serial_number	    TEXT PRIMARY KEY NOT NULL,\n"
                     +"certificate		BLOB UNIQUE NOT NULL,\n"
-                    +"common_name 	    VARCHAR(30) NOT NULL,\n"
+                    +"common_name 	    TEXT NOT NULL,\n"
                     +"creation_ms	 	INTEGER NOT NULL,\n"
                     +"expiration_ms 	INTEGER NOT NULL\n"
                     +");";
