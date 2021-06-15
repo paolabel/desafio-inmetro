@@ -9,21 +9,19 @@ public class DateHandler {
     static final int TIME_FORMAT_LENGHT = 8;
 
     private static int[] getDateArray(String dateString) throws Exception{
-        // dateString deve estar no formato "DD/MM/YYYY"
         if(dateString.length() != DATE_FORMAT_LENGHT) {
             throw new Exception("Formato de data inválido");
         }
         String[] dateStringArray = dateString.split("-");
-        int year = Integer.parseInt(dateStringArray[2]);
+        int year = Integer.parseInt(dateStringArray[0]);
         int month = Integer.parseInt(dateStringArray[1]);
-        int day = Integer.parseInt(dateStringArray[0]);
+        int day = Integer.parseInt(dateStringArray[2]);
 
         int[] dateArray = new int[]{year, month, day};
         return dateArray;
     }
 
     private static int[] getTimeArray(String timeString) throws Exception{
-        // timeString deve estar no formato "HH:MM:SS"
         if(timeString.length() != TIME_FORMAT_LENGHT) {
             throw new Exception("Formato de tempo inválido");
         }

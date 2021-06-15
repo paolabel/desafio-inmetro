@@ -4,7 +4,7 @@ API desenvolvida em Java com Spring Boot para o desafio de desenvolvimento back-
 
 Parâmetros com "*" são obrigatórios
 
-Datas precisam estar no formato DD-MM-YYYYTHH:MM:SS (exemplo: 28-02-2025T12:30:00)
+Datas precisam estar no formato YYYY-MM-DDTHH:MM:SS (exemplo: 2025-02-28T12:30:00)
 
 ## Rotas:
 
