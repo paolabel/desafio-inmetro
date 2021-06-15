@@ -4,13 +4,14 @@ API desenvolvida em Java com Spring Boot para o desafio de desenvolvimento back-
 
 Parâmetros com "*" são obrigatórios
 
+Datas precisam estar no formato DD/MM/YYYYTHH:MM:SS (exemplo: 28/02/2025T12:30:00)
+
 ## Rotas:
 
 ### /certificates
 
 - POST: cria um novo certificado e o insere no banco de dados
   - Params: ```name*```, ```expirationDate*```
-    - ```expirationDate``` precisa estar no formato "DD/MM/YYYYTHH:MM:SS"
 - GET: retona todos os certificados presentes no banco de dados
 - DELETE: apaga todos os certificados do banco de dados
 
@@ -30,19 +31,16 @@ Parâmetros com "*" são obrigatórios
 
 - GET: retorna todos os certificados válidos em algum momento do intervalo de tempo inserido cujo nome do titular = ```name```
   - Params: ```name*```, ```startDate*```, ```endDate*```
-    - ```startDate``` e ```endDate``` precisam estar no formato "DD/MM/YYYYTHH:MM:SS" 
 
 ### /certificates/valid
 
 - GET: se ```date``` não foi inserido, mostra todos os certificados válidos no momento do request, caso contrário, mostra todos os certificados válidos na data inserida
   - Params: ```date```
-    - ```date``` precisa estar no formato "DD/MM/YYYYTHH:MM:SS"
 
 ### /certificates/valid/interval
 
 - GET: retorna todos os certificados válidos em algum momento do intervalo de tempo inserido
   - Params: ```startDate*```, ```endDate*```
-    - ```startDate``` e ```endDate``` precisam estar no formato "DD/MM/YYYYTHH:MM:SS" 
 
 ### /certificates/expired
 
