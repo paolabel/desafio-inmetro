@@ -1,6 +1,5 @@
 package com.example.apidesafio.service;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.util.ArrayList;
@@ -100,13 +99,12 @@ public class DBHandler {
         }
     }
 
-
     public static ArrayList<X509Certificate> selectValidsOnTime(Long start_ms, Long end_ms) throws Exception {
         if (start_ms > end_ms) {
             throw new Exception("Seleção com período de tempo inválido");
         }
 
-        String query =  "SELECT certificate from Certificates"
+        String query =  "SELECT certificate from Certificates "
                         +"WHERE ? > creation_ms AND ? < expiration_ms";
 
         Connection dbConnection = connect();
@@ -131,7 +129,7 @@ public class DBHandler {
     }
 
     public static ArrayList<X509Certificate> selectValidNow() throws Exception {
-        String query = "SELECT certificate from Certificates"
+        String query = "SELECT certificate from Certificates "
                         +"WHERE creation_ms < ? AND expiration_ms > ?";
 
         Long now_ms = DateHandler.getCurrentMilliseconds();
@@ -147,12 +145,25 @@ public class DBHandler {
     }
 
     public static ArrayList<X509Certificate> selectByName(String name) throws Exception{
-        String query = "SELECT certificate from Certificates"
+        String query = "SELECT certificate from Certificates "
                         +"WHERE name = ?"; 
 
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
         statement.setString(1, name);
+        ResultSet results = statement.executeQuery();
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
+
+        return selection;
+    }
+
+    public static ArrayList<X509Certificate> selectBySerial(String serialNumber) throws Exception{
+        String query = "SELECT certificate from Certificates "
+                        +"WHERE serial_number = ?"; 
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setString(1, serialNumber);
         ResultSet results = statement.executeQuery();
         ArrayList<X509Certificate> selection = getFromResultSet(results);
 

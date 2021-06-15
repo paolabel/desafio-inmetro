@@ -17,7 +17,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigInteger;
 
 import java.security.KeyPair;
@@ -28,7 +27,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -108,12 +106,18 @@ public class X509CertificateHandler {
 
     public static String getResponseText(ArrayList<X509Certificate> certificates) throws Exception {
         String response = "";
-
+        JSONObject response = new JSONObject();
+        response.put("certificates", new ArrayList<JSONObject>());
         for (X509Certificate certificate : certificates) {
             String[] fields = extractFields(certificate);
-            response = response.concat("Nome do titular: "+fields[0]+"\nNúmero serial: "+fields[1]
-                            +"\nChave pública: "+fields[2]+"\nData de criação: "+fields[3]
-                            +"\nVálido até: "+fields[4]+"\n\n");              
+            
+            response = response.concat(
+                "Nome do titular: "+fields[0]
+                +"\nNúmero serial: "+fields[1]
+                +"\nChave pública: "+fields[2]
+                +"\nData de criação: "+fields[3]
+                +"\nVálido até: "+fields[4]+
+                "\n\n");              
         }
         return response;
     }
