@@ -25,7 +25,7 @@ A aplicação fica disponível em "http://localhost:8080/". Use um cliente HTTP 
 
 - POST: cria um novo certificado e o insere no banco de dados
   - Params: ```name*```, ```expirationDate*```
-- GET: retona todos os certificados presentes no banco de dados
+- GET: retorna todos os certificados presentes no banco de dados
 - DELETE: apaga todos os certificados do banco de dados
 
 ### /certificates/__\<serialNumber>__
