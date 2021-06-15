@@ -114,11 +114,11 @@ public class APIController {
     }
 
     @GetMapping("/certificates/name")
-    public ResponseEntity<String> selectByName(String commonName) {
+    public ResponseEntity<String> selectByName(String name) {
         JSONObject responseBody = new JSONObject();
 
         try {
-            ArrayList<X509Certificate> selection = DBHandler.selectByName(commonName);
+            ArrayList<X509Certificate> selection = DBHandler.selectByName(name);
             responseBody = X509CertificateHandler.getResponseBody(selection);
 
         } catch (Exception exception) {
@@ -130,18 +130,18 @@ public class APIController {
     }
     
     @DeleteMapping("/certificates/name")
-    public ResponseEntity<String> deleteByName(String commonName) {
+    public ResponseEntity<String> deleteByName(String name) {
         try {
-            DBHandler.delete(true,commonName);
+            DBHandler.delete(true,name);
         } catch(Exception exception) {
             return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        String responseBody = "Os certificados de " +commonName+ "foram removidos";
+        String responseBody = "Os certificados de " +name+ "foram removidos";
         return new ResponseEntity<String>(responseBody, HttpStatus.OK);
     }    
 
     @GetMapping("/certificates/name/interval")
-    public ResponseEntity<String> selectValidCertsByName(String commonName, String startDate, String endDate) {
+    public ResponseEntity<String> selectValidCertsByName(String name, String startDate, String endDate) {
         // startDate e endDate devem estar no formato "DD/MM/YYYYTHH:MM:SS"
 
         JSONObject responseBody = new JSONObject();
@@ -151,7 +151,7 @@ public class APIController {
             String[] endDateArray = startDate.split("T");
             Long start_ms = DateHandler.getMilliseconds(startDateArray[0], startDateArray[1]);
             Long end_ms = DateHandler.getMilliseconds(endDateArray[0], endDateArray[1]);
-            ArrayList<X509Certificate> selection = DBHandler.selectByNameAndInterval(commonName, start_ms, end_ms);
+            ArrayList<X509Certificate> selection = DBHandler.selectByNameAndInterval(name, start_ms, end_ms);
             responseBody = X509CertificateHandler.getResponseBody(selection);
 
         } catch (Exception exception) {
