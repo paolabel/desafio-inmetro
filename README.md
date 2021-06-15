@@ -2,8 +2,8 @@
 
 API desenvolvida em Java com Spring Boot e SQLite3 para o desafio de desenvolvimento back-end. Possui rotas para criar e acessar certificados X.509 autoassinados.
 
-- Parâmetros com "*" são obrigatórios
-- Datas precisam estar no formato YYYY-MM-DDTHH:MM:SS (exemplo: 2025-02-28T12:30:00)
+- Parâmetros com "*" são obrigatórios.
+- Datas precisam estar no formato YYYY-MM-DDTHH:MM:SS (exemplo: 2025-02-28T12:30:00).
 
 ## Pré-requisitos
 
@@ -16,6 +16,8 @@ API desenvolvida em Java com Spring Boot e SQLite3 para o desafio de desenvolvim
   
 - Para executar o projeto:
   - ```make run```
+
+A aplicação fica disponível em "http://localhost:8080/". Use um cliente HTTP (por exemplo, Postman, Thunder Client, etc) para testar as requisições. 
 
 ## Rotas:
 
