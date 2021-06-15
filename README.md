@@ -1,6 +1,6 @@
 # desafio-inmetro
 
-API desenvolvida em Java com Spring Boot e SQLite3 para o desafio de desenvolvimento back-end. Possui rotas para criar e acessar certificados X.509.
+API desenvolvida em Java com Spring Boot e SQLite3 para o desafio de desenvolvimento back-end. Possui rotas para criar e acessar certificados X.509 autoassinados.
 
 - Parâmetros com "*" são obrigatórios
 - Datas precisam estar no formato YYYY-MM-DDTHH:MM:SS (exemplo: 2025-02-28T12:30:00)
