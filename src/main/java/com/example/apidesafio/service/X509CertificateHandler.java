@@ -4,6 +4,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.json.JSONObject;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -104,22 +105,23 @@ public class X509CertificateHandler {
         return commonName;
     }
 
-    public static String getResponseText(ArrayList<X509Certificate> certificates) throws Exception {
-        String response = "";
-        JSONObject response = new JSONObject();
-        response.put("certificates", new ArrayList<JSONObject>());
+    public static JSONObject getResponseBody(ArrayList<X509Certificate> certificates) throws Exception {
+        JSONObject responseBody = new JSONObject();
+        ArrayList<JSONObject> certificateList = new ArrayList<JSONObject>();
+
         for (X509Certificate certificate : certificates) {
             String[] fields = extractFields(certificate);
+            JSONObject certificateJson = new JSONObject();
+            certificateJson.put("name", fields[0]);
+            certificateJson.put("serialNumber", fields[1]);
+            certificateJson.put("publicKey", fields[2]);
+            certificateJson.put("creationDate", fields[3]);
+            certificateJson.put("expirationDate", fields[4]);
             
-            response = response.concat(
-                "Nome do titular: "+fields[0]
-                +"\nNúmero serial: "+fields[1]
-                +"\nChave pública: "+fields[2]
-                +"\nData de criação: "+fields[3]
-                +"\nVálido até: "+fields[4]+
-                "\n\n");              
+            certificateList.add(certificateJson);
         }
-        return response;
+        responseBody.put("certificates", certificateList);
+        return responseBody;
     }
 
     public static X509Certificate getCertificate(byte[] byteArray) throws CertificateException {

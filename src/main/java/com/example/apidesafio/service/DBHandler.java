@@ -43,12 +43,11 @@ public class DBHandler {
         }
     }
 
-    public static boolean insert(X509Certificate certificate) {
+    public static boolean insert(X509Certificate certificate) throws Exception{
         boolean isInserted = false;
         String sql = "INSERT INTO Certificates(serial_number, certificate, name,"
                     +" creation_ms, expiration_ms) VALUES (?, ?, ?, ?, ?)";  
 
-        try {
             String commonName = X509CertificateHandler.getCommonName(certificate);
 
             Connection dbConnection = connect();
@@ -61,45 +60,32 @@ public class DBHandler {
             
             isInserted = statement.execute();
 
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
-            exception.printStackTrace();
-        }
         return isInserted;
     }
 
-    public static boolean delete(String serialNumber) {
+    public static boolean delete(String serialNumber) throws Exception{
         String sql = "DELETE FROM Certificates WHERE serial_number = ?";
 
         boolean isDeleted = false;
 
-        try{
             Connection dbConnection = connect();
             PreparedStatement statement = dbConnection.prepareStatement(sql);
             statement.setString(1, serialNumber);
             isDeleted = statement.execute();
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
-            exception.printStackTrace();
-        }
     
         return isDeleted;
     }
 
-    public static void deleteAll() {
+    public static void deleteAll() throws Exception{
         String sql = "DELETE FROM Certificates";
 
-        try{
-            Connection dbConnection = connect();
-            Statement statement = dbConnection.createStatement();
-            statement.execute(sql);
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
-            exception.printStackTrace();
-        }
+        Connection dbConnection = connect();
+        Statement statement = dbConnection.createStatement();
+        statement.execute(sql);
+
     }
 
-    public static ArrayList<X509Certificate> selectValidsOnTime(Long start_ms, Long end_ms) throws Exception {
+    public static ArrayList<X509Certificate> selectValidOn(Long start_ms, Long end_ms) throws Exception {
         if (start_ms > end_ms) {
             throw new Exception("Seleção com período de tempo inválido");
         }
@@ -128,16 +114,14 @@ public class DBHandler {
         return selection;
     }
 
-    public static ArrayList<X509Certificate> selectValidNow() throws Exception {
+    public static ArrayList<X509Certificate> selectValidOn(Long day_ms) throws Exception {
         String query = "SELECT certificate from Certificates "
                         +"WHERE creation_ms < ? AND expiration_ms > ?";
 
-        Long now_ms = DateHandler.getCurrentMilliseconds();
-
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
-        statement.setLong(1, now_ms);
-        statement.setLong(2, now_ms);
+        statement.setLong(1, day_ms);
+        statement.setLong(2, day_ms);
         ResultSet results = statement.executeQuery();
         ArrayList<X509Certificate> selection = getFromResultSet(results);
 
@@ -157,6 +141,23 @@ public class DBHandler {
         return selection;
     }
 
+    public static ArrayList<X509Certificate> selectByNameAndInterval(String name, Long start_ms, Long end_ms) throws Exception{
+        if (start_ms > end_ms) {
+            throw new Exception("Seleção com período de tempo inválido");
+        }
+        String query = "SELECT certificate from Certificates "
+                        +"WHERE name = ? AND ? > creation_ms AND ? < expiration_ms"; 
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setString(1, name);
+        statement.setLong(2, end_ms);
+        statement.setLong(3, start_ms);
+        ResultSet results = statement.executeQuery();
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
+
+        return selection;
+    }
     public static ArrayList<X509Certificate> selectBySerial(String serialNumber) throws Exception{
         String query = "SELECT certificate from Certificates "
                         +"WHERE serial_number = ?"; 
