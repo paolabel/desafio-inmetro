@@ -1,4 +1,5 @@
 build:
+	mkdir data
 	docker build -t desafio-paola:latest .
 
 run: 
