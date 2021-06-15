@@ -6,12 +6,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApidesafioApplication {
+public class MainApplication {
 
 	public static void main(String[] args) {
 		DBHandler.connect();
 		DBHandler.createCertTable();
-		SpringApplication.run(ApidesafioApplication.class, args);
+		SpringApplication.run(MainApplication.class, args);
 	}
 
 }

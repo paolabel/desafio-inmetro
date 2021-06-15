@@ -26,9 +26,9 @@ public class DBHandler {
 
     public static void createCertTable() {
         String sql = "CREATE TABLE IF NOT EXISTS Certificates (\n"
-                    +"serial_number	    INTEGER PRIMARY KEY NOT NULL,\n"
+                    +"serial_number	    VARCHAR(30) PRIMARY KEY NOT NULL,\n"
                     +"certificate		BLOB UNIQUE NOT NULL,\n"
-                    +"name 	            VARCHAR(30) NOT NULL,\n"
+                    +"common_name 	    VARCHAR(30) NOT NULL,\n"
                     +"creation_ms	 	INTEGER NOT NULL,\n"
                     +"expiration_ms 	INTEGER NOT NULL\n"
                     +");";
@@ -45,7 +45,7 @@ public class DBHandler {
 
     public static boolean insert(X509Certificate certificate) throws Exception{
         boolean isInserted = false;
-        String sql = "INSERT INTO Certificates(serial_number, certificate, name,"
+        String sql = "INSERT INTO Certificates(serial_number, certificate, common_name,"
                     +" creation_ms, expiration_ms) VALUES (?, ?, ?, ?, ?)";  
 
             String commonName = X509CertificateHandler.getCommonName(certificate);
@@ -63,14 +63,20 @@ public class DBHandler {
         return isInserted;
     }
 
-    public static boolean delete(String serialNumber) throws Exception{
-        String sql = "DELETE FROM Certificates WHERE serial_number = ?";
+    public static boolean delete(boolean name, String queryParam) throws Exception{
+        String sql = "DELETE FROM Certificates WHERE ";
+
+        if (name){
+            sql = sql.concat("common_name = ?");
+        } else {
+            sql = sql.concat("serial_number = ?");
+        }    
 
         boolean isDeleted = false;
 
             Connection dbConnection = connect();
             PreparedStatement statement = dbConnection.prepareStatement(sql);
-            statement.setString(1, serialNumber);
+            statement.setString(1, queryParam);
             isDeleted = statement.execute();
     
         return isDeleted;
@@ -128,13 +134,33 @@ public class DBHandler {
         return selection;
     }
 
-    public static ArrayList<X509Certificate> selectByName(String name) throws Exception{
-        String query = "SELECT certificate from Certificates "
-                        +"WHERE name = ?"; 
+    public static ArrayList<X509Certificate> queryExpiredOn(boolean delete, Long day_ms) throws Exception {
+        String query = "";
+
+        if (delete) {
+            query = query.concat("DELETE ");
+        } else {
+            query = query.concat("SELECT ");
+        }
+        query = query.concat("certificate from Certificates "
+                            +"WHERE expiration_ms < ?");
 
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
-        statement.setString(1, name);
+        statement.setLong(1, day_ms);
+        ResultSet results = statement.executeQuery();
+        ArrayList<X509Certificate> selection = getFromResultSet(results);
+
+        return selection;
+    }
+
+    public static ArrayList<X509Certificate> selectByName(String commonName) throws Exception{
+        String query = "SELECT certificate from Certificates "
+                        +"WHERE common_name = ?"; 
+
+        Connection dbConnection = connect();
+        PreparedStatement statement = dbConnection.prepareStatement(query);
+        statement.setString(1, commonName);
         ResultSet results = statement.executeQuery();
         ArrayList<X509Certificate> selection = getFromResultSet(results);
 
@@ -146,7 +172,7 @@ public class DBHandler {
             throw new Exception("Seleção com período de tempo inválido");
         }
         String query = "SELECT certificate from Certificates "
-                        +"WHERE name = ? AND ? > creation_ms AND ? < expiration_ms"; 
+                        +"WHERE common_name = ? AND ? > creation_ms AND ? < expiration_ms"; 
 
         Connection dbConnection = connect();
         PreparedStatement statement = dbConnection.prepareStatement(query);
@@ -158,6 +184,7 @@ public class DBHandler {
 
         return selection;
     }
+
     public static ArrayList<X509Certificate> selectBySerial(String serialNumber) throws Exception{
         String query = "SELECT certificate from Certificates "
                         +"WHERE serial_number = ?"; 

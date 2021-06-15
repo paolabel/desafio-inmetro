@@ -8,12 +8,10 @@ public class DateHandler {
     static final int DATE_FORMAT_LENGHT = 10;
     static final int TIME_FORMAT_LENGHT = 8;
 
-    private static int[] getDateArray(String dateString) {
+    private static int[] getDateArray(String dateString) throws Exception{
         // dateString deve estar no formato "DD/MM/YYYY"
         if(dateString.length() != DATE_FORMAT_LENGHT) {
-            Exception exception = new Exception("Formato de data inválido");
-            System.out.println(exception.getMessage());
-            return null;
+            throw new Exception("Formato de data inválido");
         }
         String[] dateStringArray = dateString.split("/");
         int year = Integer.parseInt(dateStringArray[2]);
@@ -24,12 +22,10 @@ public class DateHandler {
         return dateArray;
     }
 
-    private static int[] getTimeArray(String timeString) {
+    private static int[] getTimeArray(String timeString) throws Exception{
         // timeString deve estar no formato "HH:MM:SS"
         if(timeString.length() != TIME_FORMAT_LENGHT) {
-            Exception exception = new Exception("Formato de tempo inválido");
-            System.out.println(exception.getMessage());
-            return null;
+            throw new Exception("Formato de tempo inválido");
         }
         String[] timeStringArray = timeString.split(":");
         int hour = Integer.parseInt(timeStringArray[0]);
@@ -40,7 +36,7 @@ public class DateHandler {
         return timeArray;
     }
 
-    public static Date getDate(String dateString) {
+    public static Date getDate(String dateString) throws Exception{
         int[] dateArray = getDateArray(dateString);
         Calendar calendar = Calendar.getInstance();
         calendar.set(dateArray[0], dateArray[1], dateArray[2]);
@@ -48,14 +44,14 @@ public class DateHandler {
         return date;
     }
 
-    public static Date getDateTime(String dateString, String timeString) {
+    public static Date getDateTime(String dateString, String timeString) throws Exception{
 
         Calendar calendar = Calendar.getInstance();
 
         int[] dateArray = getDateArray(dateString);
         int[] timeArray = getTimeArray(timeString);
 
-        calendar.set(dateArray[0], dateArray[1], dateArray[2], timeArray[0], timeArray[1], timeArray[2]);
+        calendar.set(dateArray[0], dateArray[1] - 1, dateArray[2], timeArray[0], timeArray[1], timeArray[2]);
         Date dateTime = calendar.getTime();
         
         return dateTime;
@@ -67,7 +63,7 @@ public class DateHandler {
         return now_ms;
     }
 
-    public static Long getMilliseconds(String dateString, String timeString) {
+    public static Long getMilliseconds(String dateString, String timeString) throws Exception{
         Date date = getDateTime(dateString, timeString);
         Long date_ms = date.getTime();
         return date_ms;

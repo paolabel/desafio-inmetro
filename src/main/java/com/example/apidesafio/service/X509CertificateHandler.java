@@ -28,7 +28,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -45,16 +44,16 @@ public class X509CertificateHandler {
     private final static String KEY_PAIR_GEN_ALGORITHM = "RSA";
     private final static int KEY_SIZE = 2048;
 
-    public static X509Certificate newSelfSignedCert(String name, Date expirationTime) throws Exception{
+    public static X509Certificate newSelfSignedCert(String commonName, Date expirationTime) throws Exception{
 
         Provider bcProvider = new BouncyCastleProvider();
         Security.addProvider(bcProvider);
 
         Date creationTime = Calendar.getInstance().getTime();
 
-        String rnd = "CN="+name+",O=My Organisation,L=My City,C=DE";
+        String rdn = "CN="+commonName+",O=Default Organisation,L=Default City,C=Default Country";
 
-        X500Name issuerName = new X500Name(rnd);
+        X500Name subjectName = new X500Name(rdn);
 
         BigInteger serialNumber = new BigInteger(SERIAL_NUMBER_LENGHT, new Random());
 
@@ -64,8 +63,8 @@ public class X509CertificateHandler {
 
         SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 
-        X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(issuerName,
-                serialNumber, creationTime, expirationTime, issuerName, subjectPublicKeyInfo);
+        X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(subjectName,
+                serialNumber, creationTime, expirationTime, subjectName, subjectPublicKeyInfo);
 
         JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM);    
 
@@ -88,17 +87,17 @@ public class X509CertificateHandler {
 
     public static String[] extractFields(X509Certificate certificate) throws Exception{
 
-        String issuerName = getCommonName(certificate);
+        String commonName = getCommonName(certificate);
         String serialNumber = certificate.getSerialNumber().toString();
         String publicKey = certificate.getPublicKey().toString();
         String creationTime = certificate.getNotBefore().toString();
         String expirationTime = certificate.getNotAfter().toString();
 
-        String[] fields = new String[]{issuerName, serialNumber, publicKey, creationTime, expirationTime};
+        String[] fields = new String[]{commonName, serialNumber, publicKey, creationTime, expirationTime};
         return fields;
     }
 
-    public static String getCommonName(X509Certificate certificate) throws CertificateEncodingException{
+    public static String getCommonName(X509Certificate certificate) throws Exception{
         X500Name subjectName = new JcaX509CertificateHolder(certificate).getSubject();
         RDN rdn = subjectName.getRDNs(BCStyle.CN)[0];
         String commonName = IETFUtils.valueToString(rdn.getFirst().getValue());
@@ -112,7 +111,7 @@ public class X509CertificateHandler {
         for (X509Certificate certificate : certificates) {
             String[] fields = extractFields(certificate);
             JSONObject certificateJson = new JSONObject();
-            certificateJson.put("name", fields[0]);
+            certificateJson.put("commonName", fields[0]);
             certificateJson.put("serialNumber", fields[1]);
             certificateJson.put("publicKey", fields[2]);
             certificateJson.put("creationDate", fields[3]);
@@ -131,7 +130,7 @@ public class X509CertificateHandler {
         return certificate;
     }
 
-    public static byte[] x509ToPEM(final X509Certificate cert) throws Exception {
+    public static byte[] x509ToPEM(X509Certificate cert) throws Exception {
         StringWriter writer = new StringWriter();
         JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
         pemWriter.writeObject(cert);
