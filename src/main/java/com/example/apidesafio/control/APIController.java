@@ -23,7 +23,6 @@ public class APIController {
 
     @PostMapping("/certificates")
     public ResponseEntity<String> newCertificate(String name, String expirationDate) {
-        // expirationDate deve estar no formato "DD/MM/YYYYTHH:MM:SS"
         JSONObject responseBody = new JSONObject();
 
         Date expirationTime = new Date();
@@ -142,8 +141,6 @@ public class APIController {
 
     @GetMapping("/certificates/name/interval")
     public ResponseEntity<String> selectValidCertsByName(String name, String startDate, String endDate) {
-        // startDate e endDate devem estar no formato "DD/MM/YYYYTHH:MM:SS"
-
         JSONObject responseBody = new JSONObject();
 
         try {
@@ -164,7 +161,6 @@ public class APIController {
 
     @GetMapping("/certificates/valid")
     public ResponseEntity<String> selectValidCertsNow(String date) {
-
         JSONObject responseBody = new JSONObject();
         Long date_ms = DateHandler.getCurrentMilliseconds();
 
@@ -192,8 +188,6 @@ public class APIController {
 
     @GetMapping("/certificates/valid/interval")
     public ResponseEntity<String> selectValidCerts(String startDate, String endDate) {
-        // startDate e endDate devem estar no formato "DD/MM/YYYYTHH:MM:SS"
-        
         String[] startDateArray = startDate.split("T");
         String[] endDateArray = startDate.split("T");
 

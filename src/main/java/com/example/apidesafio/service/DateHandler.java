@@ -13,7 +13,7 @@ public class DateHandler {
         if(dateString.length() != DATE_FORMAT_LENGHT) {
             throw new Exception("Formato de data inválido");
         }
-        String[] dateStringArray = dateString.split("/");
+        String[] dateStringArray = dateString.split("-");
         int year = Integer.parseInt(dateStringArray[2]);
         int month = Integer.parseInt(dateStringArray[1]);
         int day = Integer.parseInt(dateStringArray[0]);
